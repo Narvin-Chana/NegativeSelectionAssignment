@@ -15,17 +15,19 @@ files = {
     "lang/xhosa.txt"
 }
 
+# Runs negsel2.jar for the english.test file which is used in all other comparisons
 subprocess.run(f'java -jar negsel2.jar -self english.train -n {n} -r {r} -c -l < ./english.test > res.txt',
                shell=True)
 englishData = np.loadtxt('res.txt')
 
 for test_set in files:
-
+    # Runs negsel2.jar for the test_set
     subprocess.run(f'java -jar negsel2.jar -self english.train -n {n} -r {r} -c -l < {test_set} > ./{test_set}result',
                    shell=True)
 
     test_data = np.loadtxt(f'{test_set}result')
 
+    # Concatenate results with englishData
     y_score = np.concatenate((englishData, test_data))
     y_true = np.concatenate((np.zeros(englishData.size, dtype=np.int32), np.ones(test_data.size, dtype=np.int32)))
     y_sorted = np.argsort(y_score)
